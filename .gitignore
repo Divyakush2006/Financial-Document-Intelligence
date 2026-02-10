@@ -1,0 +1,126 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project-specific test files
+test_*.py
+*_test.py
+tests/
+backend/test_*.py
+backend/*_test.py
+backend/check_pipeline.py
+backend/apply_migration.py
+backend/fix_supabase_data.py
+
+# Extraction results and temporary data
+extraction_results/
+extraction_results_direct/
+temp/
+tmp/
+*.tmp
+uploads/
+backend/uploads/
+frontend/uploads/
+
+# Excel/PDF files (sample data)
+*.xlsx
+*.xls
+*.pdf
+
+# JSON result files (generated data)
+*_result.json
+extraction_summary.json
+
+# Setup and migration scripts
+backend/automated_import_pipeline.py
+backend/excel_direct_extractor.py
+backend/setup_*.py
+backend/migrate_*.py
+backend/create_*.py
+
+# Logs
+*.log
+logs/
+backend/logs/
+frontend/logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cloudinary and API keys (already in .env but extra safety)
+cloudinary_config.py
+
+# Node modules (if any frontend build tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+*.pyc
+
+# Coverage reports
+.coverage
+coverage/
+*.cover
+
+# Jupyter Notebooks (if any)
+.ipynb_checkpoints/
+*.ipynb
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

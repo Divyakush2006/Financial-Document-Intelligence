@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Statement Intelligence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction {
+            padding: 12px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .transaction-desc {
+            font-weight: 500;
+            margin: 5px 0;
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .success {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .error {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1></h1>
+            <h1>🏦 Bank Statement Intelligence</h1>
+            <p class="subtitle">Upload Excel files and analyze with AI-powered natural language queries</p>
+        </div>
+
+        <div class="grid">
+            <!-- Upload Section -->
+            <div class="card">
+                <h2>📤 Upload Statement</h2>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📁</div>
+                    <p>Click to upload Excel file (.xlsx, .xls)</p>
+                    <p style="font-size: 12px; color: #888; margin-top: 10px;">Auto-extracts transactions and stores in
+                        database</p>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(this)">
+                </div>
+                <div id="uploadResult"></div>
+            </div>
+
+            <!-- AI Query Section -->
+            <div class="card">
+                <h2>🤖 AI Query</h2>
+                <textarea id="queryInput" placeholder="Ask me anything about your statements...
+Examples:
+- Show all UPI payments over ₹5000
+- Dream11 transactions
+- Total spending in May 2025
+- What's my balance?" rows="4"></textarea>
+                <button class="btn" onclick="queryAI()">Ask AI</button>
+                <div id="queryResult"></div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card">
+            <h2>🔍 Search Transactions</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <input type="text" id="searchDesc" placeholder="Description (e.g. Dream11)">
+                <input type="text" id="searchMethod" placeholder="Payment Method (e.g. UPI)">
+                <input type="text" id="searchAmount" placeholder="Min Amount (e.g. 100)">
+            </div>
+            <button class="btn" onclick="searchTransactions()">Search</button>
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="card">
+            <h2>📊 Analytics</h2>
+            <button class="btn" onclick="getAnalytics()">Get Summary</button>
+            <div id="analyticsResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Track the most recently uploaded account for isolated querying
+        let currentAccount = null;
+        let currentStatementId = null;
+
+        async function uploadFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.innerHTML = '<div class="loading">⏳ Uploading and processing...</div>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store current account for isolated querying
+                    currentAccount = data.account_number;
+                    currentStatementId = data.statement_id;
+
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Success!<br>
+                            Statement ID: ${data.statement_id}<br>
+                            Account: ${data.account_number}<br>
+                            Transactions: ${data.transaction_count}<br>
+                            ${data.message}<br>
+                            <br>
+                            <strong>🔒 Queries will now search ONLY this account</strong>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ ${data.error || 'Upload failed'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+
+            input.value = '';
+        }
+
+        async function queryAI() {
+            const message = document.getElementById('queryInput').value.trim();
+            const resultDiv = document.getElementById('queryResult');
+
+            // Client-side validation
+            if (!message) {
+                resultDiv.innerHTML = '<div class="error">❌ Please enter a query</div>';
+                return;
+            }
+
+            if (message.length > 500) {
+                resultDiv.innerHTML = '<div class="error">❌ Query is too long (max 500 characters)</div>';
+                return;
+            }
+
+            // Check if an account has been uploaded
+            if (!currentAccount) {
+                resultDiv.innerHTML = '<div class="error">⚠️ Please upload a bank statement first</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="loading">🤖 AI is thinking...</div>';
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message,
+                        statement_id: currentStatementId,  // Filter to current statement
+                        account: currentAccount  // Filter to current account
+                    })
+                });
+
+                const data = await response.json();
+
+                // Handle success
+                if (data.success) {
+                    let html = `<div class="results">`;
+
+                    // Show message
+                    html += `<strong>${data.message}</strong>`;
+
+                    // Show metadata (execution time, AI status, filters)
+                    if (data.metadata) {
+                        const metadata = data.metadata;
+                        html += '<div style="font-size: 11px; color: #888; margin-top: 5px;">';
+
+                        if (metadata.execution_time_ms) {
+                            html += `⚡ ${metadata.execution_time_ms}ms `;
+                        }
+
+                        if (metadata.fallback_used) {
+                            html += `| ⚠️ Fallback mode `;
+                        } else if (metadata.ai_status === 'active') {
+                            html += `| 🤖 AI-powered `;
+                        }
+
+                        if (data.filters_used && Object.keys(data.filters_used).length > 0) {
+                            const filterCount = Object.keys(data.filters_used).length;
+                            html += `| 🔍 ${filterCount} filter(s) applied`;
+                        }
+
+                        html += '</div>';
+                    }
+
+                    // Show summary if present
+                    if (data.summary) {
+                        html += '<div style="background: #f0f7ff; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 13px;">';
+                        html += `<strong>Summary:</strong><br>`;
+                        html += `💰 Total Credits: ₹${data.summary.total_credits.toLocaleString()}<br>`;
+                        html += `💳 Total Debits: ₹${data.summary.total_debits.toLocaleString()}<br>`;
+                        html += `📊 Net: ₹${data.summary.net_amount.toLocaleString()}`;
+                        html += '</div>';
+                    }
+
+                    // Show transactions
+                    if (data.transactions && data.transactions.length > 0) {
+                        html += '<div style="margin-top: 15px;">';
+                        data.transactions.forEach(txn => {
+                            const amount = txn.debit || txn.credit || 0;
+                            const type = txn.debit > 0 ? 'debit' : 'credit';
+                            html += `
+                                <div class="transaction">
+                                    <div class="transaction-date">${txn.date}${txn.payment_method ? ' | ' + txn.payment_method : ''}</div>
+                                    <div class="transaction-desc">${txn.description.substring(0, 70)}${txn.description.length > 70 ? '...' : ''}</div>
+                                    <div class="transaction-amount" style="color: ${type === 'debit' ? '#f44336' : '#4caf50'}">
+                                        ${type === 'debit' ? '-' : '+'}₹${amount.toLocaleString()}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                    }
+
+                    // Show analytics if present
+                    if (data.analytics) {
+                        html += '<div style="margin-top: 15px;">';
+                        html += '<strong style="font-size: 16px;">📊 Analytics Results</strong>';
+                        html += '<pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 13px; margin-top: 10px;">';
+                        html += JSON.stringify(data.analytics, null, 2);
+                        html += '</pre>';
+                        html += '</div>';
+                    }
+
+                    html += '</div>';
+                    resultDiv.innerHTML = html;
+
+                } else {
+                    // Handle error response
+                    const error = data.error || {};
+                    let errorHtml = '<div class="error">';
+                    errorHtml += `<strong>❌ ${error.message || 'Query failed'}</strong><br>`;
+
+                    if (error.suggestion) {
+                        errorHtml += `<div style="margin-top: 10px; font-size: 13px;">`;
+                        errorHtml += `💡 <strong>Suggestion:</strong> ${error.suggestion}`;
+                        errorHtml += `</div>`;
+                    }
+
+                    if (error.details) {
+                        errorHtml += `< div style = "margin-top: 5px; font-size: 11px; opacity: 0.8;" > `;
+                        errorHtml += `Details: ${error.details} `;
+                        errorHtml += `</div > `;
+                    }
+
+                    if (error.code) {
+                        errorHtml += `< div style = "margin-top: 5px; font-size: 10px; opacity: 0.7;" > `;
+                        errorHtml += `Error Code: ${error.code} `;
+                        errorHtml += `</div > `;
+                    }
+
+                    errorHtml += '</div>';
+                    resultDiv.innerHTML = errorHtml;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `< div class="error" >❌ Network Error: ${error.message} <br><span style="font-size: 12px;">Please check if the backend server is running</span></div>`;
+            }
+        }
+
+        async function searchTransactions() {
+            const desc = document.getElementById('searchDesc').value;
+            const method = document.getElementById('searchMethod').value;
+            const amount = document.getElementById('searchAmount').value;
+
+            const resultDiv = document.getElementById('searchResults');
+
+            // Check if an account has been uploaded
+            if (!currentAccount) {
+                resultDiv.innerHTML = '<div class="error">⚠️ Please upload a bank statement first</div>';
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('account', currentAccount);  // Auto-filter by current account
+            if (desc) params.append('description', desc);
+            if (method) params.append('payment_method', method);
+            if (amount) params.append('min_amount', amount);
+
+            resultDiv.innerHTML = '<div class="loading">🔍 Searching...</div>';
+
+            try {
+                const response = await fetch('/search?' + params);
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = `< div class="results" > <strong>Found ${data.count} transactions</strong>`;
+
+                    if (data.transactions && data.transactions.length > 0) {
+                        html += '<div style="margin-top: 15px;">';
+                        data.transactions.forEach(txn => {  // Show ALL results
+                            const amount = txn.debit || txn.credit || 0;
+                            html += `
+                            < div class="transaction" >
+                                    <div class="transaction-date">${txn.date} | ${txn.payment_method || 'OTHER'}</div>
+                                    <div class="transaction-desc">${txn.description.substring(0, 80)}</div>
+                                    <div class="transaction-amount">₹${amount.toLocaleString()}</div>
+                                </div >
+                            `;
+                        });
+                        html += '</div>';
+                    }
+
+                    html += '</div>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `< div class="error" >❌ ${data.error || 'Search failed'}</div > `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `< div class="error" >❌ Error: ${error.message}</div > `;
+            }
+        }
+
+        async function getAnalytics() {
+            const resultDiv = document.getElementById('analyticsResult');
+            resultDiv.innerHTML = '<div class="loading">📊 Loading analytics...</div>';
+
+            try {
+                const response = await fetch('/analytics');
+                const data = await response.json();
+
+                if (data.success) {
+                    const html = `
+                            < div class="results" >
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #667eea;">₹${data.combined_balance.toLocaleString()}</div>
+                                    <div style="color: #888; font-size: 12px;">Total Balance</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #4caf50;">₹${data.combined_credits.toLocaleString()}</div>
+                                    <div style="color: #888; font-size: 12px;">Total Credits</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #f44336;">₹${data.combined_debits.toLocaleString()}</div>
+                                    <div style="color: #888; font-size: 12px;">Total Debits</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; text-align: center; color: #888;">
+                                ${data.total_accounts} accounts
+                            </div>
+                        </div >
+                            `;
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `< div class="error" >❌ ${data.error || 'Analytics failed'}</div > `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `< div class="error" >❌ Error: ${error.message}</div >`;
+            }
+        }
+    </script>
+</body>
+
+</html>
