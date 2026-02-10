@@ -5,7 +5,7 @@
 ![Flask Badge](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask)
 ![Supabase Badge](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase)
 ![Docker Badge](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
-![License Badge](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Status Badge](https://img.shields.io/badge/Status-Production--Ready-success?style=for-the-badge)
 
 > **Enterprise-grade financial analytics powered by AI.** Transform raw bank statements into actionable intelligence with Natural Language Queries.
 
@@ -182,9 +182,11 @@ We welcome contributions to enhance the platform!
 
 ---
 
-## 📄 License
+## � Contact
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+Project Link: [https://github.com/Divyakush2006/Financial-Document-Intelligence](https://github.com/Divyakush2006/Financial-Document-Intelligence)
+
+Developed by **Divyakush Punjabi** - [divyakushpunjabi@gmail.com](mailto:divyakushpunjabi@gmail.com)
 
 ---
 
