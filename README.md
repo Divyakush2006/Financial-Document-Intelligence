@@ -51,7 +51,7 @@ graph TD
 
 ---
 
-## 🧗 Challenges Faced & Solutions
+## 🧗 Problems Faced
 
 ### 1. Handling Heavy Extraction Loads
 **Challenge:** Processing large PDF/Excel statements with thousands of transactions often caused timeouts or UI freezes in a monolithic architecture.
@@ -190,8 +190,4 @@ Developed by **Divyakush Punjabi** - [divyakushpunjabi@gmail.com](mailto:divyaku
 
 ---
 
-<p align="center">
-  <b>Built for Scalability, Security, and Intelligence.</b>
-  <br>
-  Developed by <a href="https://github.com/Divyakush2006">Divyakush Punjabi</a>
-</p>
+
