@@ -28,8 +28,6 @@ Designed for high-volume environments, this platform serves fintech startups, cr
 
 ## 🏗️ Architecture
 
-The system follows a microservices-oriented architecture, separating the heavy extraction logic from the user-facing query engine.
-
 ```mermaid
 graph TD
     User[User] -->|Uploads Statement| FE[Frontend (Flask)] 
@@ -50,6 +48,22 @@ graph TD
         Response -->|JSON/Visuals| FE
     end
 ```
+
+---
+
+## 🧗 Challenges Faced & Solutions
+
+### 1. Handling Heavy Extraction Loads
+**Challenge:** Processing large PDF/Excel statements with thousands of transactions often caused timeouts or UI freezes in a monolithic architecture.
+**Solution:** The system follows a microservices-oriented architecture, separating the heavy extraction logic from the user-facing query engine. This ensures the dashboard remains responsive even while heavy background processing occurs.
+
+### 2. LLM Hallucinations on Financial Data
+**Challenge:** Generic LLMs often "hallucinate" numbers or invent transactions when asked specific questions.
+**Solution:** We implemented a **RAG (Retrieval-Augmented Generation)** pipeline where the LLM only generates SQL queries or filters based on strict schemas, never answering directly from its training data. This ensures 100% data accuracy.
+
+### 3. Diverse Bank Statement Formats
+**Challenge:** Every bank uses a different layout, date format, and column structure, making rule-based parsing brittle.
+**Solution:** Developed a **Hybrid Parser** that uses regex heuristics for common formats and falls back to an LLM-vision approach for unstructured documents, creating a robust universal ingestion engine.
 
 ---
 
